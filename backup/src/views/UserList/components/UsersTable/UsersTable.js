@@ -257,7 +257,7 @@ const handleDeactivateBranch = event => {
   
   axios({
     method: 'DELETE', 
-    url: API_BASE_URL + '/mainbranch-service/v1/branch/deactiveBranch', 
+    url: API_BASE_URL + '/mainbranch-service/v1/branch/deactivateBranch', 
     data: data, 
     headers: {
       'Authorization': `Bearer ${localData.accessToken}`,

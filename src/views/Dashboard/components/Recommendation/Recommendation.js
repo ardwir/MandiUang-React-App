@@ -81,7 +81,7 @@ const Recommendation = props => {
       className={clsx(classes.root, className)}
     >
       <CardHeader
-        title="Produt Recommendation"
+        title="Product Recommendation"
       />
       <Divider />
       <AliceCarousel

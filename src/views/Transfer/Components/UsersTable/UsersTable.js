@@ -261,7 +261,7 @@ const handleTrxMainToBranch = event => {
   
   axios({
     method: 'POST', 
-    url: API_BASE_URL + '/trx-service/v1/transactionMain/TrxMainToBranch', 
+    url: API_BASE_URL + '/trx-service/v1/transactionMain/trxMainToBranch', 
     data: data, 
     headers: {
       'Authorization': `Bearer ${localData.accessToken}`,
