@@ -8,6 +8,7 @@ import { makeStyles } from '@material-ui/styles';
 import BranchProfile from './components/BranchProfile';
 import "react-datepicker/dist/react-datepicker.css";
 import validate from 'validate.js';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 import {
   AppBar, 
@@ -23,6 +24,7 @@ import {
   Card,
   CardActions,
   CardContent,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -115,7 +117,12 @@ const useStyles = makeStyles(theme => ({
   },
   actions: {
     justifyContent: 'flex-end'
-  }
+  },
+  confirmButton: {
+    marginRight: theme.spacing(1), 
+    backgroundColor: 'white', 
+    color: '#00ae8d'
+  },
 }));
 
 const schema = {
@@ -130,6 +137,12 @@ const schema = {
     }
   },
   transferType: {
+    presence: { allowEmpty: false, message: 'is required' },
+    length: {
+      maximum: 20
+    }
+  },
+  remarks: {
     presence: { allowEmpty: false, message: 'is required' },
     length: {
       maximum: 140
@@ -153,12 +166,15 @@ const UsersTable = props => {
 
   const classes = useStyles();
 
+  const [transferAmt, setTransferAmt] = useState({});
+  const [transferRemarks, setTransferRemarks] = useState({});
   const [branchId, setBranchId] = useState({});
   const [branchAcctNo, setBranchAcctNo] = useState({}); 
   const [branchs, setBranchs] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [openRow2, setOpenRow2] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(0);
   const [date, setDate] = React.useState('');
   const [month, setMonth] = React.useState('');
@@ -188,7 +204,8 @@ const UsersTable = props => {
     setRowsPerPage(event.target.value);
   };
 
-  // ====================================== Main To Branch Trx ======================================
+// =================================================== Big Transfer Dialog =================================================
+// ====================================== Main To Branch Immidieate Trx ======================================
 const [formState, setFormState] = useState({
   isValid: false,
   values: {},
@@ -197,14 +214,6 @@ const [formState, setFormState] = useState({
 });
 const handleChange = (event, newValue) => {
   setValue(newValue);
-};
-
-const handleChange3 = (event) => {
-  setMonth(event.target.value);
-};
-
-const handleChange2 = (event) => {
-  setDate(event.target.value);
 };
 
 // open dialog transfer
@@ -255,6 +264,7 @@ const handleTrxMainToBranch = event => {
       "branch_account_id": `${formState.values.branchAccountId}`,
       "transfer_type": "Immediately",
       "trx_amount": `${formState.values.transferAmount}`,
+      "remarks": `${formState.values.remarks}`,
       "verification_code": `${formState.values.verificationCode}`
     }
   ) 
@@ -277,9 +287,65 @@ const handleTrxMainToBranch = event => {
   }).catch(err => {
     console.warn(err)
     console.log(data)
-    alert('Deactivation Failed')
+    alert('Main To Branch Transfer Failed')
   })
 };
+// =================================================== Immidiate TRX Confirmation =================================================
+const handleBack = () => {
+  setOpen(false);
+};
+
+const handleClickOpen = () => {
+  setTransferAmt(`${formState.values.transferAmount}`);
+  setTransferRemarks(`${formState.values.remarks}`)
+  setOpen(true); 
+}
+
+const handleClickClose = () => {
+  setOpen(false);
+  // setOpenRow2(false);
+}
+
+// ====================================== Main To Branch PostDate Trx ======================================
+const handleChange2 = (event) => {
+  setMonth(event.target.value);
+};
+// =================================================== PostDate TRX Confirmation =================================================
+const handleBack2 = () => {
+  setOpen(false);
+};
+
+const handleClickOpen2 = () => {
+  setTransferAmt(`${formState.values.transferAmount}`);
+  setOpen(true); 
+}
+
+const handleClickClose2 = () => {
+  setOpen(false);
+  // setOpenRow2(false);
+}
+
+
+// ====================================== Main To Branch Scheduled Trx ======================================
+const handleChange3 = (event) => {
+  setDate(event.target.value);
+};
+// =================================================== Scheduled TRX Confirmation =================================================
+const handleBack3 = () => {
+  setOpen(false);
+};
+
+const handleClickOpen3 = () => {
+  setTransferAmt(`${formState.values.transferAmount}`);
+  setOpen(true); 
+}
+
+const handleClickClose3 = () => {
+  setOpen(false);
+  // setOpenRow2(false);
+}
+
+// ====================================== Render Side ======================================
   return (
     <Card
       {...rest}
@@ -349,7 +415,9 @@ const handleTrxMainToBranch = event => {
           rowsPerPageOptions={[5, 10, 25]}
         />
       </CardActions>
-  
+
+  {/* ====================================== Big Trx Dialog ====================================== */}
+
       <Dialog onClose={handleRowClose2} aria-labelledby="customized-dialog-title" open={openRow2} maxWidth = 'lg' fullWidth>
         <DialogTitle className={classes.dialogTitle} id="customized-dialog-title" onClose={handleRowClose2}>
           <span style={{color: 'white'}}>Transfer To Branch</span>
@@ -367,6 +435,8 @@ const handleTrxMainToBranch = event => {
               <Tab label="Scheduled" {...a11yProps(2)} />
             </Tabs>
           </AppBar>
+
+          {/* ====================================== Immediate Trx Dialog ====================================== */}
           <TabPanel value={value} index={0}>
             <TextField
               disabled
@@ -397,35 +467,34 @@ const handleTrxMainToBranch = event => {
               name="transferAmount"
               value={formState.values.transferAmount || ''}
               onChange={handleChangeTransfer}
-              type="text"
+              type="number"
               variant="outlined"
             />
             <TextField
               className={classes.textField}
               fullWidth
-              label="Verification Code"
-              name="verificationCode"
-              value={formState.values.verificationCode || ''}
+              label="Remarks"
+              name="remarks"
+              value={formState.values.remarks || ''}
               onChange={handleChangeTransfer}
-              type="password"
+              type="text"
               variant="outlined"
             />
-            <div className={classes.agreement}>
-              <Checkbox
-                className={classes.agreementCheckbox}
-                color="primary"
-                name="agreement"
-                style={{paddingLeft:'15px'}}
-              />
-              <Typography
-                color="textSecondary"
-                variant="body1"
+            <DialogActions>
+              <Button 
+                autoFocus 
+                onClick={handleClickOpen} 
+                color="primary" 
+                style={{paddingRight:"15px"}}
+                disabled={!formState.values.transferAmount}
+                // disabled={true}
               >
-                Are You Sure To Tranfer To This Branch ?
-              </Typography>
-            </div>
+                Transfer
+              </Button>
+            </DialogActions>
           </TabPanel>
 
+    {/* ====================================== Postponed Trx Dialog ====================================== */}
           <TabPanel value={value} index={1}>
             <TextField
               disabled
@@ -485,8 +554,19 @@ const handleTrxMainToBranch = event => {
                 Are You Sure To Tranfer To This Branch ?
               </Typography>
             </div>
+            <DialogActions>
+              <Button 
+                autoFocus 
+                onClick={handleClickOpen2} 
+                color="primary" 
+                style={{paddingRight:"15px"}}
+              >
+                Transfer
+              </Button>
+            </DialogActions>
           </TabPanel>
 
+  {/* ====================================== Scheduled Trx Dialog ====================================== */}
           <TabPanel value={value} index={2}>
             <TextField
               disabled
@@ -613,15 +693,105 @@ const handleTrxMainToBranch = event => {
                 Are You Sure To Tranfer To This Branch ?
               </Typography>
             </div>
-          </TabPanel>
-        </PerfectScrollbar>
-      </CardContent>
-    </DialogContent>
+              <DialogActions>
+                <Button 
+                  autoFocus 
+                  onClick={handleClickOpen3} 
+                  color="primary" 
+                  style={{paddingRight:"15px"}}
+                >
+                Transfer
+                </Button>
+              </DialogActions>
+            </TabPanel>
+          </PerfectScrollbar>
+        </CardContent>
+      </DialogContent>
+    </Dialog>
 
+   {/* ====================================== Immediate Trx Confirmation Dialog ====================================== */}
+    <Dialog onClose={handleClickClose} aria-labelledby="customized-dialog-title" open={open} maxWidth = 'lg'>
+        <DialogTitle className={classes.dialogTitle} id="customized-dialog-title" onClose={handleClickClose}>
+        <IconButton onClick={handleBack}>
+          <ArrowBackIcon />
+        </IconButton>
+          <span style={{color: 'white'}}>Transfer Confirmation</span>
+        </DialogTitle>
+        <DialogContent dividers>
+          <CardContent className={classes.content}>
+            <PerfectScrollbar>
+            <TextField
+              disabled
+              className={classes.textField}
+              fullWidth
+              label="Branch ID"
+              name="branchAccountId"
+              value={branchId}
+              onChange={handleChangeTransfer}
+              type="text"
+              variant="outlined"
+            />
+            <TextField
+              disabled
+              className={classes.textField}
+              fullWidth
+              label="Branch Account Number"
+              name="branchAccountNo"
+              value={branchAcctNo}
+              type="text"
+              variant="outlined"
+            />
+            <TextField
+              disabled
+              className={classes.textField}
+              fullWidth
+              label="Transfer Amount"
+              name="transferAmount"
+              value={transferAmt}
+              type="number"
+              variant="outlined"
+            />
+            <TextField
+              disabled
+              className={classes.textField}
+              fullWidth
+              label="Remarks"
+              name="remarks"
+              value={transferRemarks}
+              type="text"
+              variant="outlined"
+            />
+            <TextField
+              className={classes.textField}
+              fullWidth
+              label="Verification Code"
+              name="verificationCode"
+              value={formState.values.verificationCode || ''}
+              onChange={handleChangeTransfer}
+              type="password"
+              variant="outlined"
+            />
+              <div className={classes.agreement}>
+                <Checkbox
+                  className={classes.agreementCheckbox}
+                  color="primary"
+                  name="agreement"
+                  style={{paddingLeft:'15px'}}
+                />
+                <Typography
+                  color="textSecondary"
+                  variant="body1"
+                >
+                  Are You Sure To Transfer To This Branch ?
+                </Typography>
+              </div>
+            </PerfectScrollbar>
+          </CardContent>
+        </DialogContent>
         <DialogActions>
-          <Button 
-            autoFocus onClick={handleTrxMainToBranch} color="primary" 
-            style={{paddingRight:"15px"}}
+          <Button
+          className={classes.confirmButton}
+          autoFocus onClick={handleTrxMainToBranch}
           >
             Confirm Transfer
           </Button>

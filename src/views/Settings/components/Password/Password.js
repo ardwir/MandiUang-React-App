@@ -162,7 +162,7 @@ const Password = props => {
         <Divider />
         <CardActions>
           <Button 
-          disabled={formState.values.password === formState.values.confirmPassword ? false : true }
+          disabled={formState.values.password === formState.values.confirmPassword && formState.values.oldPassword ? false : true }
           autoFocus onClick={handleChangePassword} color="primary">
             Update
           </Button>
