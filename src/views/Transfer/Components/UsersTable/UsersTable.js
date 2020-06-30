@@ -251,7 +251,7 @@ const handleTrxMainToBranch = event => {
   event.preventDefault();
   var data = JSON.stringify(
     {
-      "branch_account_no": `${formState.values.branchAccountNo}`,
+      "transfer_to_acct": `${formState.values.branchAccountNo}`,
       "branch_account_id": `${formState.values.branchAccountId}`,
       "transfer_type": "Immediately",
       "trx_amount": `${formState.values.transferAmount}`,
