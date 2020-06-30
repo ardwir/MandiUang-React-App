@@ -176,7 +176,7 @@ const UsersTable = props => {
               <TableHead>
                 <TableRow>
                   <TableCell>Transfer ID</TableCell>
-                  <TableCell>Origin</TableCell>
+                  {/* <TableCell>Origin</TableCell> */}
                   <TableCell>Destination</TableCell>
                   <TableCell>Amount</TableCell>
                   <TableCell sortDirection="desc">
@@ -203,7 +203,7 @@ const UsersTable = props => {
                     onClick={()=>handleRowClick(mainTrxList.mainAcctTrxId)}
                   >
                     <TableCell>{mainTrxList.mainAcctTrxId}</TableCell>
-                    <TableCell>Chandra Wijaya</TableCell>
+                    {/* <TableCell>Chandra Wijaya</TableCell> */}
                     <TableCell>{mainTrxList.transferToAcct}</TableCell>
                     <TableCell>{mainTrxList.trxAmount}</TableCell>
                     <TableCell>
