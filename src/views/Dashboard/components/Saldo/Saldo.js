@@ -10,7 +10,6 @@ import {
   Typography,
   Avatar
 } from '@material-ui/core';
-import MoneyIcon from '@material-ui/icons/Money';
 import AttachMoneyIcon from '@material-ui/icons/AttachMoney'
 import { API_BASE_URL } from '../../../../constants'
 
@@ -36,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     }
   },
   avatar: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: 'green',
     color: theme.palette.primary.contrastText,
     height: 56,
     width: 56
@@ -92,7 +91,7 @@ const Saldo = props => {
               gutterBottom
               variant="h2"
             >
-              Balance
+              Total Balance
             </Typography>
             
             <Typography color="inherit" variant="h4">Rp. {moneyDots}</Typography>

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
+import axios from 'axios';
+import { API_BASE_URL } from '../../../../../constants'
 import moment from 'moment';
 import { makeStyles } from '@material-ui/styles';
 import {
@@ -33,10 +35,28 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const BranchProfile = props => {
-  const { className, ...rest } = props;
-
+  const { className, branchId, ...rest } = props;
+  
+  const [ branchProfile, setBranchProfile ] = useState({});
+  const localData = JSON.parse(localStorage.getItem("data"));
+  
   const classes = useStyles();
-
+  
+  useEffect(() => {
+    console.log(branchId)
+    axios.get(API_BASE_URL + `/mainbranch-service/v1/branch/branchProfile/${branchId}`, {
+        headers: {
+          'Authorization': `Bearer ${localData.accessToken}` 
+        }
+    })
+        .then(res => {
+            console.log(res) 
+            setBranchProfile(res.data);
+        })
+        .catch(err => {
+            console.log(err + localData.accessToken)
+        })
+  }, [branchProfile.branchAccountId])
   const user = {
     name: 'Test Test',
     city: 'DKI Jakarta',
@@ -57,14 +77,14 @@ const BranchProfile = props => {
               gutterBottom
               variant="h2"
             >
-            ABC Part 1
+              {branchProfile.branchName}
             </Typography>
             <Typography
               className={classes.locationText}
               color="textSecondary"
               variant="body1"
             >
-              {user.city}, {user.country}
+              {branchProfile.cityName}, {branchProfile.address}
             </Typography>
             <Typography
               className={classes.dateText}
@@ -78,12 +98,13 @@ const BranchProfile = props => {
               color="textSecondary"
               variant="body1"
             >
-              Balance: Rp. 30.000.000 / 120.000.000
+              Balance: Rp. 10000 / {branchProfile.branchBalance}
             </Typography>
             <div className={classes.progress}>
-              <Typography variant="body1">Budget Limit: 25%</Typography>
+              <Typography variant="body1">Budget Limit: {Math.floor(1000000/`${branchProfile.branchBalance}`).toFixed(2)}%</Typography>
+              {/* Math.Round Bug angka pembilang nya harus di kali 100 baru bener */}
               <LinearProgress
-                value={25}
+                value={0/`${branchProfile.branchBalance}`}
                 variant="determinate"
               />
             </div>

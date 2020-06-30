@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
+import axios from 'axios'; 
+import { API_BASE_URL } from '../../../../constants';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
 import {
@@ -9,11 +11,13 @@ import {
   Typography,
   Avatar
 } from '@material-ui/core';
-import MoneyIcon from '@material-ui/icons/Money';
+import MoneyBurn from '@material-ui/icons/Eject';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    height: '100%'
+    height: '100%',
+    backgroundColor: '#FD7B6F',
+    color: theme.palette.primary.contrastText
   },
   content: {
     alignItems: 'center',
@@ -21,10 +25,10 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     fontWeight: 700,
-    color: '#c20013'
+    color: 'white'
   },
   avatar: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: 'red',
     color: theme.palette.primary.contrastText,
     height: 56,
     width: 56
@@ -41,7 +45,27 @@ const useStyles = makeStyles(theme => ({
 const SaldoOut = props => {
   const { className, ...rest } = props;
 
+  const [ mainProfile, setMainProfile ] = useState({});
+  const localData = JSON.parse(localStorage.getItem("data"));
+  
   const classes = useStyles();
+
+  var money = `${mainProfile.mainBalance}`;
+  var moneyDots = (money/10).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1."); // hardcoded for demo
+  useEffect(() => {
+    axios.get(API_BASE_URL + '/mainbranch-service/v1/main/mainProfile', {
+        headers: {
+          'Authorization': `Bearer ${localData.accessToken}` 
+        }
+    })
+        .then(res => {
+            console.log(res) 
+            setMainProfile(res.data);
+        })
+        .catch(err => {
+            console.log(err)
+        })
+  }, [mainProfile.id])
 
   return (
     <Card
@@ -59,15 +83,15 @@ const SaldoOut = props => {
               className={classes.title}
               color="textSecondary"
               gutterBottom
-              variant="body2"
+              variant="h4"
             >
               Balance OUT
             </Typography>
-            <Typography variant="h4">Rp 1.000.000.000</Typography>
+            <Typography color="inherit" variant="h4">Rp. {moneyDots}</Typography>
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>
-              <MoneyIcon className={classes.icon} />
+              <MoneyBurn className={classes.icon} />
             </Avatar>
           </Grid>
         </Grid>
