@@ -10,15 +10,12 @@ import {
   Button,
   Card,
   CardActions,
-  // CardHeader,
   CardContent,
-  // Checkbox,
   Dialog,
   DialogActions,
   DialogTitle,
   DialogContent,
   Divider,
-  // IconButton,
   Table,
   TableBody,
   TableCell,
@@ -28,7 +25,6 @@ import {
   Tooltip,
   TableSortLabel,
   TablePagination
-  // Typography
 } from '@material-ui/core';
 import { StatusBullet } from 'components';
 
@@ -127,25 +123,6 @@ const UsersTable = props => {
             console.log(err + localData.accessToken)
         })
   }, [])
-
-  // useEffect(() => {
-  //   axios.get(API_BASE_URL + '/trx-service/v1/transactionMain/searchMainTrx/' + {trxId} , {
-  //       headers: {
-  //         'Authorization': `Bearer ${localData.accessToken}` 
-  //       }
-  //   })
-  //       .then(res => {
-  //           console.log(res) 
-  //           setTranscationProfile(res.data);
-  //       })
-  //       .catch(err => {
-  //           console.log(err + localData.accessToken)
-  //       })
-  // }, [])
-
-  // const handleBack = () => {
-  //   setOpen(false);
-  // };
 
   const handleRowClick = (mainAcctTrxId) => {
     axios.get(API_BASE_URL + `/trx-service/v1/transactionMain/searchMainTrx/${mainAcctTrxId}` , {
@@ -284,7 +261,17 @@ const UsersTable = props => {
                 name="transferId"
                 type="text"
                 variant="outlined"
-                value={transcationProfile.mainAcctTrxId}
+                value={transcationProfile.mainToBranchTrxId || ''}
+              />
+              <TextField
+                disabled
+                className={classes.textField}
+                fullWidth
+                label="Transfered By"
+                name="transferBy"
+                type="text"
+                variant="outlined"
+                value={transcationProfile.trxByUser || ''}
               />
               <TextField
                 disabled
@@ -294,17 +281,27 @@ const UsersTable = props => {
                 name="nameOrigin"
                 type="text"
                 variant="outlined"
-                value="Chandra Wijaya"
+                value={transcationProfile.mainAccountName || ''} 
               />
               <TextField
                 disabled
                 className={classes.textField}
                 fullWidth
-                label="Transfer Destination"
+                label="Transfer Destination Name"
+                name="destinationName"
+                type="text"
+                variant="outlined"
+                value={transcationProfile.branchAccountName || ''}
+              />
+              <TextField
+                disabled
+                className={classes.textField}
+                fullWidth
+                label="transfer Destination Number"
                 name="destinationNo"
                 type="text"
                 variant="outlined"
-                value={transcationProfile.transferToAcct}
+                value={transcationProfile.transferToAcct || ''} 
               />
               <TextField
                 disabled
@@ -314,7 +311,17 @@ const UsersTable = props => {
                 name="amount"
                 type="text"
                 variant="outlined"
-                value={transcationProfile.trxAmount}
+                value={transcationProfile.trxAmount || ''}
+              />
+              <TextField
+                disabled
+                className={classes.textField}
+                fullWidth
+                label="TransferType"
+                name="type"
+                type="text"
+                variant="outlined"
+                value={transcationProfile.transferType || ''}
               />
               <TextField
                 disabled
@@ -324,7 +331,7 @@ const UsersTable = props => {
                 name="date"
                 type="text"
                 variant="outlined"
-                value={transcationProfile.trxDate}
+                value={transcationProfile.trxDate || ''}
               />
               <TextField
                 disabled
@@ -334,7 +341,7 @@ const UsersTable = props => {
                 name="remark"
                 type="text"
                 variant="outlined"
-                value={transcationProfile.remarks}
+                value={transcationProfile.remarks || ''}
               />
               <TextField
                 disabled
@@ -344,7 +351,7 @@ const UsersTable = props => {
                 name="status"
                 type="text"
                 variant="outlined"
-                value={transcationProfile.status}
+                value={transcationProfile.status || ''}
               />
             </PerfectScrollbar>
           </CardContent>
