@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
+import axios from 'axios';
+import { API_BASE_URL } from '../../../../constants'
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
-import { makeStyles, ThemeProvider } from '@material-ui/styles';
+import { makeStyles } from '@material-ui/styles';
 import {
   Button,
   Card,
   CardActions,
-  CardHeader,
+  // CardHeader,
   CardContent,
-  Checkbox,
+  // Checkbox,
   Dialog,
   DialogActions,
   DialogTitle,
   DialogContent,
   Divider,
-  IconButton,
+  // IconButton,
   Table,
   TableBody,
   TableCell,
@@ -25,8 +27,8 @@ import {
   TextField,
   Tooltip,
   TableSortLabel,
-  TablePagination,
-  Typography
+  TablePagination
+  // Typography
 } from '@material-ui/core';
 import { StatusBullet } from 'components';
 
@@ -91,28 +93,73 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const statusColors = {
-  done: 'success',
-  pending: 'info',
-  rejected: 'danger'
+  Success: 'success',
+  Pending: 'info',
+  Failed: 'danger'
 };
 
 const UsersTable = props => {
   const { className, users, ...rest } = props;
 
   const classes = useStyles();
-
-  const [requests] = useState(mockData);
-
+  
+  const [mainTrxLists, setMainTrxLists] = useState([]);
+  const [transcationProfile, setTranscationProfile] = useState({});
+  const [trxId, setTrxId] = useState();
+  const [branchId, setBranchId] = useState();
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [openRow, setOpenRow] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const localData = JSON.parse(localStorage.getItem("data"));
 
-  const handleBack = () => {
-    setOpen(false);
-  };
+  useEffect(() => {
+    axios.get(API_BASE_URL + '/trx-service/v1/transactionMain/listAllMainTrx', {
+        headers: {
+          'Authorization': `Bearer ${localData.accessToken}` 
+        }
+    })
+        .then(res => {
+            console.log(res) 
+            setMainTrxLists(res.data);
+        })
+        .catch(err => {
+            console.log(err + localData.accessToken)
+        })
+  }, [])
 
-  const handleRowClick = () => {
+  // useEffect(() => {
+  //   axios.get(API_BASE_URL + '/trx-service/v1/transactionMain/searchMainTrx/' + {trxId} , {
+  //       headers: {
+  //         'Authorization': `Bearer ${localData.accessToken}` 
+  //       }
+  //   })
+  //       .then(res => {
+  //           console.log(res) 
+  //           setTranscationProfile(res.data);
+  //       })
+  //       .catch(err => {
+  //           console.log(err + localData.accessToken)
+  //       })
+  // }, [])
+
+  // const handleBack = () => {
+  //   setOpen(false);
+  // };
+
+  const handleRowClick = (mainAcctTrxId) => {
+    axios.get(API_BASE_URL + `/trx-service/v1/transactionMain/searchMainTrx/${mainAcctTrxId}` , {
+      headers: {
+        'Authorization': `Bearer ${localData.accessToken}` 
+      }
+    })
+      .then(res => {
+          console.log(res) 
+          setTranscationProfile(res.data);
+      })
+      .catch(err => {
+          console.log(err + localData.accessToken)
+      })
     setOpenRow(true);
   };
 
@@ -152,7 +199,7 @@ const UsersTable = props => {
               <TableHead>
                 <TableRow>
                   <TableCell>Transfer ID</TableCell>
-                  <TableCell>Branch Name</TableCell>
+                  <TableCell>Origin</TableCell>
                   <TableCell>Destination</TableCell>
                   <TableCell>Amount</TableCell>
                   <TableCell sortDirection="desc">
@@ -172,27 +219,27 @@ const UsersTable = props => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {requests.map(request => (
+              {mainTrxLists.slice(0, rowsPerPage).map(mainTrxList => (
                   <TableRow
                     hover
-                    key={request.id}
-                    onClick={()=>handleRowClick(request.id)}
+                    key={mainTrxList.mainAcctTrxId}
+                    onClick={()=>handleRowClick(mainTrxList.mainAcctTrxId)}
                   >
-                    <TableCell>{request.transferID}</TableCell>
-                    <TableCell>{request.branch.name}</TableCell>
-                    <TableCell>{request.destination.name}</TableCell>
-                    <TableCell>{request.amount}</TableCell>
+                    <TableCell>{mainTrxList.mainAcctTrxId}</TableCell>
+                    <TableCell>Chandra Wijaya</TableCell>
+                    <TableCell>{mainTrxList.transferToAcct}</TableCell>
+                    <TableCell>{mainTrxList.trxAmount}</TableCell>
                     <TableCell>
-                      {moment(request.createAt).format('DD/MM/YYY')}
+                      {moment(mainTrxList.trxDate).format('DD/MM/YYY')}
                     </TableCell>
                     <TableCell>
                       <div className={classes.statusContainer}>
                         <StatusBullet
                           className={classes.status}
-                          color={statusColors[request.status]}
+                          color={statusColors[mainTrxList.status]}
                           size="sm"
                         />
-                        {request.status}
+                        {mainTrxList.status}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -205,7 +252,7 @@ const UsersTable = props => {
       <CardActions className={classes.actions}>
         <TablePagination
           component="div"
-          count={requests.length}
+          count={mainTrxLists.length}
           onChangePage={handlePageChange}
           onChangeRowPerPage={handleRowsPerPageChange}
           page={page}
@@ -226,9 +273,9 @@ const UsersTable = props => {
         <DialogContent dividers>
           <CardContent className={classes.content}>
             <PerfectScrollbar>
-              <div className={classes.inner}>
-                <TransferDetail />
-              </div>
+              {/* <div className={classes.inner}>
+                <TransferDetail branchId={branchId} />
+              </div> */}
               <TextField
                 disabled
                 className={classes.textField}
@@ -237,27 +284,27 @@ const UsersTable = props => {
                 name="transferId"
                 type="text"
                 variant="outlined"
-                value="0"
+                value={transcationProfile.mainAcctTrxId}
               />
               <TextField
                 disabled
                 className={classes.textField}
                 fullWidth
-                label="Branch Account Number"
-                name="branchId"
+                label="transfer Origin"
+                name="nameOrigin"
                 type="text"
                 variant="outlined"
-                value='1234567890'
+                value="Chandra Wijaya"
               />
               <TextField
                 disabled
                 className={classes.textField}
                 fullWidth
-                label="Destination"
-                name="destinationId"
+                label="Transfer Destination"
+                name="destinationNo"
                 type="text"
                 variant="outlined"
-                value='1234567891'
+                value={transcationProfile.transferToAcct}
               />
               <TextField
                 disabled
@@ -267,7 +314,7 @@ const UsersTable = props => {
                 name="amount"
                 type="text"
                 variant="outlined"
-                value='Rp 10.000.000'
+                value={transcationProfile.trxAmount}
               />
               <TextField
                 disabled
@@ -277,17 +324,7 @@ const UsersTable = props => {
                 name="date"
                 type="text"
                 variant="outlined"
-                value='24/06/2020'
-              />
-              <TextField
-                disabled
-                className={classes.textField}
-                fullWidth
-                label="Status"
-                name="status"
-                type="text"
-                variant="outlined"
-                value='done'
+                value={transcationProfile.trxDate}
               />
               <TextField
                 disabled
@@ -297,7 +334,17 @@ const UsersTable = props => {
                 name="remark"
                 type="text"
                 variant="outlined"
-                value='this is the remarks'
+                value={transcationProfile.remarks}
+              />
+              <TextField
+                disabled
+                className={classes.textField}
+                fullWidth
+                label="Status"
+                name="status"
+                type="text"
+                variant="outlined"
+                value={transcationProfile.status}
               />
             </PerfectScrollbar>
           </CardContent>

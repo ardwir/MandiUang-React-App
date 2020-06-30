@@ -77,28 +77,28 @@ const TransferDetail = props => {
               gutterBottom
               variant="h2"
             >
-              Branch Name Here
-              {/* {branchProfile.branchName} */}
+              {/* Branch Name Here */}
+              {branchProfile.branchName}
             </Typography>
             <Typography
               className={classes.locationText}
               color="textSecondary"
               variant="body1"
             >
-              Branch Location
-              {/* {branchProfile.cityName}, {branchProfile.address} */}
+              {/* Branch Location */}
+              {branchProfile.cityName}, {branchProfile.address}
             </Typography>
             <Typography
               className={classes.dateText}
               color="textSecondary"
               variant="body1"
             >
-              Balance: Rp. 30.000.000 / 120.000.000
+              Balance: Rp. 30.000.000 / {branchProfile.branchBalance}
             </Typography>
             <div className={classes.progress}>
               <Typography variant="body1">Budget Limit: 25%</Typography>
               <LinearProgress
-                value={25}
+                value={0/`${branchProfile.branchBalance}`}
                 variant="determinate"
               />
             </div>
