@@ -175,9 +175,10 @@ const UsersTable = props => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Transfer ID</TableCell>
+                  <TableCell>Ref Number</TableCell>
                   {/* <TableCell>Origin</TableCell> */}
                   <TableCell>Destination</TableCell>
+                  <TableCell>Transfer Type</TableCell>
                   <TableCell>Amount</TableCell>
                   <TableCell sortDirection="desc">
                     <Tooltip
@@ -202,9 +203,10 @@ const UsersTable = props => {
                     key={mainTrxList.mainAcctTrxId}
                     onClick={()=>handleRowClick(mainTrxList.mainAcctTrxId)}
                   >
-                    <TableCell>{mainTrxList.mainAcctTrxId}</TableCell>
+                    <TableCell>007/1/{mainTrxList.mainAcctTrxId}</TableCell>
                     {/* <TableCell>Chandra Wijaya</TableCell> */}
                     <TableCell>{mainTrxList.transferToAcct}</TableCell>
+                    <TableCell>{mainTrxList.transferType}</TableCell>
                     <TableCell>{mainTrxList.trxAmount}</TableCell>
                     <TableCell>
                       {moment(mainTrxList.trxDate).format('DD/MM/YYY')}
